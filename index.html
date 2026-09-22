@@ -1,42 +1,382 @@
-<!doctype html>
-<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Control de asistencia QR</title>
+
 <style>
-*{box-sizing:border-box}body{margin:0;background:#f2f6f3;font-family:Arial,sans-serif;color:#17201b}
-.card{max-width:470px;margin:25px auto;padding:25px;background:#fff;border-radius:22px;box-shadow:0 8px 28px #0002}
-h1{margin:0 0 6px;font-size:27px}.sub{color:#68736d;margin-bottom:20px}
-.info{background:#e8f7ed;padding:16px;border-radius:14px;margin-bottom:20px;line-height:1.7}
-label{font-weight:bold;display:block;margin:13px 0 7px}input{width:100%;padding:14px;border:1px solid #ccd6cf;border-radius:10px;font-size:17px}
-button{width:100%;border:0;border-radius:10px;padding:15px;background:#16a34a;color:#fff;font-weight:bold;font-size:17px;margin-top:18px}
-.result{display:none;margin-top:20px;padding:16px;border-radius:14px;line-height:1.6}.ok{background:#e8f7ed;color:#126b35}.bad{background:#ffeded;color:#a32323}
-.small{font-size:12px;color:#78827c;text-align:center;margin-top:18px}
-</style></head><body>
+*{box-sizing:border-box}
+
+body{
+    margin:0;
+    font-family:Arial,sans-serif;
+    background:#f4f7f5;
+    color:#17201a;
+}
+
+.card{
+    max-width:520px;
+    margin:25px auto;
+    background:white;
+    padding:25px;
+    border-radius:24px;
+    box-shadow:0 12px 35px rgba(0,0,0,.12);
+}
+
+h1{
+    margin:0 0 6px;
+    font-size:32px;
+}
+
+.sub{
+    color:#68736d;
+    margin-bottom:25px;
+    font-size:18px;
+}
+
+.info{
+    background:#e8f7ed;
+    padding:18px;
+    border-radius:18px;
+    margin-bottom:22px;
+}
+
+.info b{
+    color:#286b3c;
+}
+
+label{
+    display:block;
+    font-weight:bold;
+    margin:15px 0 8px;
+    font-size:18px;
+}
+
+input{
+    width:100%;
+    padding:18px;
+    border:2px solid #d5ddd8;
+    border-radius:15px;
+    font-size:18px;
+}
+
+button{
+    width:100%;
+    margin-top:22px;
+    padding:18px;
+    border:0;
+    border-radius:15px;
+    background:#49a653;
+    color:white;
+    font-size:19px;
+    font-weight:bold;
+}
+
+.result{
+    display:none;
+    margin-top:22px;
+    padding:20px;
+    border-radius:18px;
+    background:#e8f7ed;
+    color:#286b3c;
+}
+
+.error{
+    display:none;
+    margin-top:18px;
+    padding:15px;
+    border-radius:15px;
+    background:#ffe8e8;
+    color:#a52b2b;
+}
+
+.small{
+    text-align:center;
+    color:#78827c;
+    margin-top:25px;
+    font-size:13px;
+}
+</style>
+</head>
+
+<body>
+
 <div class="card">
-<h1>Control de asistencia</h1><div class="sub">Registro de entrada a clase</div>
+
+<h1>Control de asistencia</h1>
+<div class="sub">Registro de entrada a clase</div>
+
 <div class="info">
-<b>📚 Clase según tu matrícula</b><br>
-La materia, clase y horario aparecerán después de validar tus datos.
+<b>📚 Clase seleccionada</b><br><br>
+
+Salón: <span id="salon">—</span><br>
+Materia: <span id="materia">—</span><br>
+Clase: <span id="clase">—</span><br>
+Horario: <span id="horario">—</span>
 </div>
-<form id="f">
-<label>Matrícula</label><input id="m" placeholder="Ej. ALU001" autocomplete="off" required>
-<label>PIN</label><input id="p" type="password" inputmode="numeric" maxlength="6" placeholder="Ej. 1234" required>
-<button>Registrar entrada</button>
+
+<form id="form">
+
+<label>Matrícula</label>
+<input
+id="matricula"
+type="text"
+placeholder="Ej. ALU001"
+autocomplete="off"
+required
+>
+
+<label>PIN</label>
+<input
+id="pin"
+type="password"
+placeholder="Ej. 1234"
+inputmode="numeric"
+required
+>
+
+<button type="submit">
+Registrar entrada
+</button>
+
 </form>
-<div id="r" class="result"></div>
-<div class="small">Versión de prueba con datos ficticios.</div>
+
+<div id="error" class="error"></div>
+
+<div id="result" class="result"></div>
+
+<div class="small">
+Versión de prueba con datos ficticios.
 </div>
+
+</div>
+
 <script>
-const alumnos={"ALU001": {"pin": "1234", "nombre": "Diego Hernández", "grupo": "3°A", "materia": "Matemáticas", "clase": "Álgebra", "horario": "08:00–09:00", "tel": "5550001001"}, "ALU002": {"pin": "2468", "nombre": "Sofía Martínez", "grupo": "3°A", "materia": "Español", "clase": "Literatura", "horario": "09:00–10:00", "tel": "5550001002"}, "ALU003": {"pin": "1357", "nombre": "Mateo García", "grupo": "3°B", "materia": "Ciencias", "clase": "Física", "horario": "08:00–09:00", "tel": "5550001003"}, "ALU004": {"pin": "4321", "nombre": "Valeria López", "grupo": "3°B", "materia": "Historia", "clase": "México", "horario": "10:00–11:00", "tel": "5550001004"}, "ALU005": {"pin": "5678", "nombre": "Santiago Pérez", "grupo": "2°A", "materia": "Inglés", "clase": "Grammar", "horario": "09:00–10:00", "tel": "5550001005"}, "ALU006": {"pin": "9876", "nombre": "Camila Torres", "grupo": "2°A", "materia": "Matemáticas", "clase": "Geometría", "horario": "11:00–12:00", "tel": "5550001006"}, "ALU007": {"pin": "1122", "nombre": "Emiliano Cruz", "grupo": "2°B", "materia": "Computación", "clase": "Programación", "horario": "10:00–11:00", "tel": "5550001007"}, "ALU008": {"pin": "3344", "nombre": "Regina Flores", "grupo": "2°B", "materia": "Biología", "clase": "Célula", "horario": "08:00–09:00", "tel": "5550001008"}};
-const r=document.getElementById('r');
-document.getElementById('f').addEventListener('submit',e=>{
- e.preventDefault();
- const m=document.getElementById('m').value.trim().toUpperCase(),p=document.getElementById('p').value.trim(),a=alumnos[m];
- if(!a||a.pin!==p){r.className='result bad';r.style.display='block';r.textContent='❌ Matrícula o PIN incorrectos.';return}
- const key='asistencia_'+m;
- if(localStorage.getItem(key)){r.className='result bad';r.style.display='block';r.textContent='⚠️ Esta entrada ya fue registrada en este dispositivo.';return}
- const now=new Date(),hora=now.toLocaleTimeString('es-MX',{hour:'2-digit',minute:'2-digit'});
- localStorage.setItem(key,JSON.stringify({fecha:now.toLocaleDateString('es-MX'),hora}));
- r.className='result ok';r.style.display='block';
- r.innerHTML=`<b>✅ Entrada registrada</b><br><b>Alumno:</b> ${a.nombre}<br><b>Grupo:</b> ${a.grupo}<br><b>Materia:</b> ${a.materia}<br><b>Clase:</b> ${a.clase}<br><b>Horario:</b> ${a.horario}<br><b>Hora de registro:</b> ${hora}`;
+
+/* =========================
+   CLASE SEGÚN EL QR
+========================= */
+
+const clases = {
+
+    "3A01-matematicas": {
+        salon:"3°A-01",
+        materia:"Matemáticas",
+        clase:"Álgebra",
+        horario:"08:00–09:00",
+        grupo:"3°A"
+    },
+
+    "3A01-espanol": {
+        salon:"3°A-01",
+        materia:"Español",
+        clase:"Literatura",
+        horario:"09:00–10:00",
+        grupo:"3°A"
+    },
+
+    "3B02-ciencias": {
+        salon:"3°B-02",
+        materia:"Ciencias",
+        clase:"Física",
+        horario:"08:00–09:00",
+        grupo:"3°B"
+    }
+
+};
+
+
+/* =========================
+   ALUMNOS FICTICIOS
+========================= */
+
+const alumnos = {
+
+    "ALU001":{
+        pin:"1234",
+        nombre:"Diego Hernández",
+        grupo:"3°A"
+    },
+
+    "ALU002":{
+        pin:"2468",
+        nombre:"Sofía Martínez",
+        grupo:"3°A"
+    },
+
+    "ALU003":{
+        pin:"1357",
+        nombre:"Mateo García",
+        grupo:"3°B"
+    }
+
+};
+
+
+/* =========================
+   LEER EL QR
+========================= */
+
+const parametros = new URLSearchParams(window.location.search);
+
+let codigoClase = parametros.get("clase");
+
+if(!codigoClase){
+    codigoClase = "3A01-matematicas";
+}
+
+const claseActual = clases[codigoClase];
+
+
+/* =========================
+   MOSTRAR CLASE
+========================= */
+
+if(claseActual){
+
+    document.getElementById("salon").textContent =
+        claseActual.salon;
+
+    document.getElementById("materia").textContent =
+        claseActual.materia;
+
+    document.getElementById("clase").textContent =
+        claseActual.clase;
+
+    document.getElementById("horario").textContent =
+        claseActual.horario;
+
+}
+
+
+/* =========================
+   REGISTRAR ASISTENCIA
+========================= */
+
+document.getElementById("form").addEventListener("submit",function(e){
+
+    e.preventDefault();
+
+    const matricula =
+        document.getElementById("matricula").value
+        .trim()
+        .toUpperCase();
+
+    const pin =
+        document.getElementById("pin").value.trim();
+
+    const error =
+        document.getElementById("error");
+
+    const result =
+        document.getElementById("result");
+
+
+    error.style.display="none";
+    result.style.display="none";
+
+
+    /* Verificar que exista la clase */
+
+    if(!claseActual){
+
+        error.textContent =
+            "❌ Este QR no corresponde a una clase válida.";
+
+        error.style.display="block";
+        return;
+    }
+
+
+    /* Buscar alumno */
+
+    const alumno = alumnos[matricula];
+
+
+    if(!alumno){
+
+        error.textContent =
+            "❌ Matrícula no encontrada.";
+
+        error.style.display="block";
+        return;
+    }
+
+
+    /* Verificar PIN */
+
+    if(alumno.pin !== pin){
+
+        error.textContent =
+            "❌ PIN incorrecto.";
+
+        error.style.display="block";
+        return;
+    }
+
+
+    /* Verificar grupo */
+
+    if(alumno.grupo !== claseActual.grupo){
+
+        error.textContent =
+            "❌ Esta clase no corresponde a tu grupo.";
+
+        error.style.display="block";
+        return;
+    }
+
+
+    /* Hora actual */
+
+    const ahora = new Date();
+
+    const horaRegistro =
+        ahora.toLocaleTimeString("es-MX",{
+            hour:"2-digit",
+            minute:"2-digit"
+        });
+
+
+    /* Mostrar resultado */
+
+    result.innerHTML = `
+        <strong>✅ Entrada registrada</strong><br><br>
+
+        <b>Alumno:</b> ${alumno.nombre}<br>
+        <b>Grupo:</b> ${alumno.grupo}<br>
+        <b>Salón:</b> ${claseActual.salon}<br>
+        <b>Materia:</b> ${claseActual.materia}<br>
+        <b>Clase:</b> ${claseActual.clase}<br>
+        <b>Horario:</b> ${claseActual.horario}<br>
+        <b>Hora de registro:</b> ${horaRegistro}
+    `;
+
+    result.style.display="block";
+
+
+    /* Guardar registro de prueba */
+
+    const registro = {
+        matricula:matricula,
+        alumno:alumno.nombre,
+        grupo:alumno.grupo,
+        salon:claseActual.salon,
+        materia:claseActual.materia,
+        clase:claseActual.clase,
+        horario:claseActual.horario,
+        horaRegistro:horaRegistro
+    };
+
+    localStorage.setItem(
+        "ultimaAsistencia",
+        JSON.stringify(registro)
+    );
+
 });
-</script></body></html>
+
+</script>
+
+</body>
+</html>
