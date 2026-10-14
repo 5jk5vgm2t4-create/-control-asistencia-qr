@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -42,9 +43,7 @@ h1{
     margin-bottom:22px;
 }
 
-.info b{
-    color:#286b3c;
-}
+.info b{color:#286b3c}
 
 label{
     display:block;
@@ -101,7 +100,6 @@ button{
 </head>
 
 <body>
-
 <div class="card">
 
 <h1>Control de asistencia</h1>
@@ -109,7 +107,6 @@ button{
 
 <div class="info">
 <b>📚 Clase seleccionada</b><br><br>
-
 Salón: <span id="salon">—</span><br>
 Materia: <span id="materia">—</span><br>
 Clase: <span id="clase">—</span><br>
@@ -117,49 +114,27 @@ Horario: <span id="horario">—</span>
 </div>
 
 <form id="form">
-
 <label>Matrícula</label>
-<input
-id="matricula"
-type="text"
-placeholder="Ej. ALU001"
-autocomplete="off"
-required
->
+<input id="matricula" type="text" placeholder="Ej. ALU001"
+autocomplete="off" required>
 
 <label>PIN</label>
-<input
-id="pin"
-type="password"
-placeholder="Ej. 1234"
-inputmode="numeric"
-required
->
+<input id="pin" type="password" placeholder="Ej. 1234"
+inputmode="numeric" required>
 
-<button type="submit">
-Registrar entrada
-</button>
-
+<button type="submit">Registrar entrada</button>
 </form>
 
 <div id="error" class="error"></div>
-
 <div id="result" class="result"></div>
 
-<div class="small">
-Versión de prueba con datos ficticios.
-</div>
-
+<div class="small">Versión de prueba con datos ficticios.</div>
 </div>
 
 <script>
-
-/* =========================
-   CLASE SEGÚN EL QR
-========================= */
+/* CLASES ASOCIADAS A CADA QR */
 
 const clases = {
-
     "3A01-matematicas": {
         salon:"3°A-01",
         materia:"Matemáticas",
@@ -167,7 +142,6 @@ const clases = {
         horario:"08:00–09:00",
         grupo:"3°A"
     },
-
     "3A01-espanol": {
         salon:"3°A-01",
         materia:"Español",
@@ -175,7 +149,6 @@ const clases = {
         horario:"09:00–10:00",
         grupo:"3°A"
     },
-
     "3B02-ciencias": {
         salon:"3°B-02",
         materia:"Ciencias",
@@ -183,43 +156,31 @@ const clases = {
         horario:"08:00–09:00",
         grupo:"3°B"
     }
-
 };
 
-
-/* =========================
-   ALUMNOS FICTICIOS
-========================= */
+/* ALUMNOS FICTICIOS */
 
 const alumnos = {
-
     "ALU001":{
         pin:"1234",
         nombre:"Diego Hernández",
         grupo:"3°A"
     },
-
     "ALU002":{
         pin:"2468",
         nombre:"Sofía Martínez",
         grupo:"3°A"
     },
-
     "ALU003":{
         pin:"1357",
         nombre:"Mateo García",
         grupo:"3°B"
     }
-
 };
 
-
-/* =========================
-   LEER EL QR
-========================= */
+/* LEER EL CÓDIGO DEL QR */
 
 const parametros = new URLSearchParams(window.location.search);
-
 let codigoClase = parametros.get("clase");
 
 if(!codigoClase){
@@ -228,122 +189,83 @@ if(!codigoClase){
 
 const claseActual = clases[codigoClase];
 
-
-/* =========================
-   MOSTRAR CLASE
-========================= */
+/* MOSTRAR LA CLASE */
 
 if(claseActual){
-
-    document.getElementById("salon").textContent =
-        claseActual.salon;
-
-    document.getElementById("materia").textContent =
-        claseActual.materia;
-
-    document.getElementById("clase").textContent =
-        claseActual.clase;
-
-    document.getElementById("horario").textContent =
-        claseActual.horario;
-
+    document.getElementById("salon").textContent = claseActual.salon;
+    document.getElementById("materia").textContent = claseActual.materia;
+    document.getElementById("clase").textContent = claseActual.clase;
+    document.getElementById("horario").textContent = claseActual.horario;
 }
 
-
-/* =========================
-   REGISTRAR ASISTENCIA
-========================= */
+/* REGISTRAR ASISTENCIA */
 
 document.getElementById("form").addEventListener("submit",function(e){
-
     e.preventDefault();
 
-    const matricula =
-        document.getElementById("matricula").value
-        .trim()
-        .toUpperCase();
+    const matricula = document.getElementById("matricula").value.trim().toUpperCase();
+    const pin = document.getElementById("pin").value.trim();
+    const error = document.getElementById("error");
+    const result = document.getElementById("result");
 
-    const pin =
-        document.getElementById("pin").value.trim();
-
-    const error =
-        document.getElementById("error");
-
-    const result =
-        document.getElementById("result");
-
-
-    error.style.display="none";
-    result.style.display="none";
-
-
-    /* Verificar que exista la clase */
+    error.style.display = "none";
+    result.style.display = "none";
 
     if(!claseActual){
-
-        error.textContent =
-            "❌ Este QR no corresponde a una clase válida.";
-
-        error.style.display="block";
+        error.textContent = "❌ Este QR no corresponde a una clase válida.";
+        error.style.display = "block";
         return;
     }
-
-
-    /* Buscar alumno */
 
     const alumno = alumnos[matricula];
 
-
     if(!alumno){
-
-        error.textContent =
-            "❌ Matrícula no encontrada.";
-
-        error.style.display="block";
+        error.textContent = "❌ Matrícula no encontrada.";
+        error.style.display = "block";
         return;
     }
-
-
-    /* Verificar PIN */
 
     if(alumno.pin !== pin){
-
-        error.textContent =
-            "❌ PIN incorrecto.";
-
-        error.style.display="block";
+        error.textContent = "❌ PIN incorrecto.";
+        error.style.display = "block";
         return;
     }
-
-
-    /* Verificar grupo */
 
     if(alumno.grupo !== claseActual.grupo){
-
-        error.textContent =
-            "❌ Esta clase no corresponde a tu grupo.";
-
-        error.style.display="block";
+        error.textContent = "❌ Esta clase no corresponde a tu grupo.";
+        error.style.display = "block";
         return;
     }
 
+    /* VALIDAR EL HORARIO */
 
-    /* Hora actual */
+    const [inicioTexto, finTexto] = claseActual.horario
+        .split(/[–-]/)
+        .map(hora => hora.trim());
+
+    function convertirAMinutos(hora){
+        const [horas, minutos] = hora.split(":").map(Number);
+        return horas * 60 + minutos;
+    }
 
     const ahora = new Date();
+    const minutosActuales = ahora.getHours() * 60 + ahora.getMinutes();
+    const minutosInicio = convertirAMinutos(inicioTexto);
+    const minutosFin = convertirAMinutos(finTexto);
 
-    const horaRegistro =
-        ahora.toLocaleTimeString("es-MX",{
-            hour:"2-digit",
-            minute:"2-digit"
-        });
+    if(minutosActuales < minutosInicio || minutosActuales >= minutosFin){
+        error.textContent = `❌ Fuera de horario. Puedes registrar de ${inicioTexto} a ${finTexto}.`;
+        error.style.display = "block";
+        return;
+    }
 
-
-    /* Mostrar resultado */
+    const horaRegistro = ahora.toLocaleTimeString("es-MX",{
+        hour:"2-digit",
+        minute:"2-digit"
+    });
 
     result.innerHTML = `
         <strong>✅ Entrada registrada</strong><br><br>
-
         <b>Alumno:</b> ${alumno.nombre}<br>
         <b>Grupo:</b> ${alumno.grupo}<br>
         <b>Salón:</b> ${claseActual.salon}<br>
@@ -353,10 +275,7 @@ document.getElementById("form").addEventListener("submit",function(e){
         <b>Hora de registro:</b> ${horaRegistro}
     `;
 
-    result.style.display="block";
-
-
-    /* Guardar registro de prueba */
+    result.style.display = "block";
 
     const registro = {
         matricula:matricula,
@@ -369,14 +288,8 @@ document.getElementById("form").addEventListener("submit",function(e){
         horaRegistro:horaRegistro
     };
 
-    localStorage.setItem(
-        "ultimaAsistencia",
-        JSON.stringify(registro)
-    );
-
+    localStorage.setItem("ultimaAsistencia",JSON.stringify(registro));
 });
-
 </script>
-
 </body>
 </html>
