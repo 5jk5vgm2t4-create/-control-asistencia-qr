@@ -1,295 +1,65 @@
-
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Control de asistencia QR</title>
-
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Control de asistencia</title>
 <style>
-*{box-sizing:border-box}
-
-body{
-    margin:0;
-    font-family:Arial,sans-serif;
-    background:#f4f7f5;
-    color:#17201a;
-}
-
-.card{
-    max-width:520px;
-    margin:25px auto;
-    background:white;
-    padding:25px;
-    border-radius:24px;
-    box-shadow:0 12px 35px rgba(0,0,0,.12);
-}
-
-h1{
-    margin:0 0 6px;
-    font-size:32px;
-}
-
-.sub{
-    color:#68736d;
-    margin-bottom:25px;
-    font-size:18px;
-}
-
-.info{
-    background:#e8f7ed;
-    padding:18px;
-    border-radius:18px;
-    margin-bottom:22px;
-}
-
-.info b{color:#286b3c}
-
-label{
-    display:block;
-    font-weight:bold;
-    margin:15px 0 8px;
-    font-size:18px;
-}
-
-input{
-    width:100%;
-    padding:18px;
-    border:2px solid #d5ddd8;
-    border-radius:15px;
-    font-size:18px;
-}
-
-button{
-    width:100%;
-    margin-top:22px;
-    padding:18px;
-    border:0;
-    border-radius:15px;
-    background:#49a653;
-    color:white;
-    font-size:19px;
-    font-weight:bold;
-}
-
-.result{
-    display:none;
-    margin-top:22px;
-    padding:20px;
-    border-radius:18px;
-    background:#e8f7ed;
-    color:#286b3c;
-}
-
-.error{
-    display:none;
-    margin-top:18px;
-    padding:15px;
-    border-radius:15px;
-    background:#ffe8e8;
-    color:#a52b2b;
-}
-
-.small{
-    text-align:center;
-    color:#78827c;
-    margin-top:25px;
-    font-size:13px;
-}
-</style>
-</head>
-
+:root{--g:#16784b;--g2:#0e5d39;--p:#eaf7ef;--ink:#173329;--muted:#60736a;--red:#b42318;--line:#dce9e0}
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:#f2f8f4;color:var(--ink)}
+header{background:linear-gradient(135deg,var(--g2),#23945d);color:white;padding:25px 16px;text-align:center}header h1{margin:0 0 6px}header p{margin:0}
+main{max-width:1000px;margin:22px auto;padding:0 14px 40px}.panel{background:white;border:1px solid var(--line);border-radius:18px;padding:20px;margin-bottom:16px;box-shadow:0 5px 18px #153e2710}
+h2{font-size:1.15rem;margin:0 0 14px}.muted,.small{color:var(--muted);font-size:.9rem}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}
+label{display:block;font-weight:650;font-size:.9rem;margin:12px 0 6px}input,select{width:100%;padding:12px;border:1px solid #c8d8ce;border-radius:10px;font:inherit;background:white;color:var(--ink)}
+button,.btn{border:0;border-radius:10px;background:var(--g);color:white;padding:12px 16px;font:inherit;font-weight:700;cursor:pointer;text-decoration:none;display:inline-block;margin-top:14px}button.secondary{background:#e7f3eb;color:var(--g2);border:1px solid #c8e4d1}
+.notice{padding:12px 14px;border-radius:10px;margin-top:14px;background:var(--p);border:1px solid #c9e7d2;white-space:pre-wrap}.error{background:#fff0ef!important;color:var(--red);border-color:#f2c7c3!important}.ok{background:#e8f7ed!important;color:#146c3d}
+.tag{display:inline-block;padding:5px 9px;border-radius:999px;background:var(--p);color:var(--g2);font-size:.82rem;font-weight:700;margin:3px}
+.qr-card{border:1px solid var(--line);border-radius:14px;padding:14px;text-align:center;overflow-wrap:anywhere}.qr-card h3{font-size:1rem;margin:5px 0}.qrbox{display:flex;justify-content:center;align-items:center;min-height:170px;margin:10px 0}
+details summary{cursor:pointer;font-weight:750;color:var(--g2)}.toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center}table{width:100%;border-collapse:collapse;font-size:.88rem}th,td{text-align:left;padding:8px;border-bottom:1px solid var(--line)}th{background:#f3faf5}
+footer{text-align:center;color:var(--muted);font-size:.82rem;padding:8px 16px 24px}
+@media print{header{background:white;color:#111}#registerPanel,#recordsPanel,footer,.toolbar,.btn{display:none!important}main{margin:0;padding:0}.panel{box-shadow:none;border:0;padding:0}details:not([open])>*:not(summary){display:block!important}details summary{display:none}.qr-card{break-inside:avoid}.grid{grid-template-columns:repeat(3,1fr)}}
+</style></head>
 <body>
-<div class="card">
-
-<h1>Control de asistencia</h1>
-<div class="sub">Registro de entrada a clase</div>
-
-<div class="info">
-<b>📚 Clase seleccionada</b><br><br>
-Salón: <span id="salon">—</span><br>
-Materia: <span id="materia">—</span><br>
-Clase: <span id="clase">—</span><br>
-Horario: <span id="horario">—</span>
-</div>
-
-<form id="form">
-<label>Matrícula</label>
-<input id="matricula" type="text" placeholder="Ej. ALU001"
-autocomplete="off" required>
-
-<label>PIN</label>
-<input id="pin" type="password" placeholder="Ej. 1234"
-inputmode="numeric" required>
-
-<button type="submit">Registrar entrada</button>
-</form>
-
-<div id="error" class="error"></div>
-<div id="result" class="result"></div>
-
-<div class="small">Versión de prueba con datos ficticios.</div>
-</div>
-
+<header><h1>Control de asistencia</h1><p>Registro de entrada por materia y grupo</p></header>
+<main>
+<section class="panel" id="registerPanel"><h2>Registro de entrada a clase</h2>
+<div id="classInfo" class="notice">Abre el QR de tu materia para comenzar.</div>
+<div class="grid"><div><label for="matricula">Matrícula</label><input id="matricula" placeholder="Ej. ALU001" autocomplete="username"></div><div><label for="pin">PIN</label><input id="pin" type="password" inputmode="numeric" placeholder="Tu PIN"></div></div>
+<button id="registerBtn">Registrar asistencia</button><div id="result" aria-live="polite"></div>
+<p class="muted">Prototipo con datos ficticios. Los registros se guardan solo en este navegador; no introduzcas datos reales aún.</p></section>
+<section class="panel"><details><summary>Panel de códigos QR (22 códigos)</summary><p class="muted">Un QR por materia y grupo. Selecciona el grupo y guarda o imprime esta sección desde el navegador.</p>
+<div class="toolbar"><label for="qrGroup" style="margin:0">Grupo</label><select id="qrGroup" style="width:auto"><option>3AIA</option><option>3BIA</option></select><button class="secondary" id="printBtn">Imprimir códigos mostrados</button></div>
+<div id="qrList" class="grid" style="margin-top:14px"></div></details></section>
+<section class="panel" id="recordsPanel"><details><summary>Registros guardados en este dispositivo</summary><p class="muted">Estos registros no se sincronizan con otros dispositivos.</p><div class="toolbar"><button class="secondary" id="exportBtn">Exportar CSV</button><button class="secondary" id="clearBtn">Borrar registros de prueba</button></div><div id="attendanceList" style="overflow-x:auto;margin-top:12px"></div></details></section>
+</main><footer>Prototipo de asistencia. Para producción se necesita servidor: el horario del dispositivo se puede modificar.</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script>
-/* CLASES ASOCIADAS A CADA QR */
-
-const clases = {
-    "3A01-matematicas": {
-        salon:"3°A-01",
-        materia:"Matemáticas",
-        clase:"Álgebra",
-        horario:"08:00–09:00",
-        grupo:"3°A"
-    },
-    "3A01-espanol": {
-        salon:"3°A-01",
-        materia:"Español",
-        clase:"Literatura",
-        horario:"09:00–10:00",
-        grupo:"3°A"
-    },
-    "3B02-ciencias": {
-        salon:"3°B-02",
-        materia:"Ciencias",
-        clase:"Física",
-        horario:"08:00–09:00",
-        grupo:"3°B"
-    }
-};
-
-/* ALUMNOS FICTICIOS */
-
-const alumnos = {
-    "ALU001":{
-        pin:"1234",
-        nombre:"Diego Hernández",
-        grupo:"3°A"
-    },
-    "ALU002":{
-        pin:"2468",
-        nombre:"Sofía Martínez",
-        grupo:"3°A"
-    },
-    "ALU003":{
-        pin:"1357",
-        nombre:"Mateo García",
-        grupo:"3°B"
-    }
-};
-
-/* LEER EL CÓDIGO DEL QR */
-
-const parametros = new URLSearchParams(window.location.search);
-let codigoClase = parametros.get("clase");
-
-if(!codigoClase){
-    codigoClase = "3A01-matematicas";
-}
-
-const claseActual = clases[codigoClase];
-
-/* MOSTRAR LA CLASE */
-
-if(claseActual){
-    document.getElementById("salon").textContent = claseActual.salon;
-    document.getElementById("materia").textContent = claseActual.materia;
-    document.getElementById("clase").textContent = claseActual.clase;
-    document.getElementById("horario").textContent = claseActual.horario;
-}
-
-/* REGISTRAR ASISTENCIA */
-
-document.getElementById("form").addEventListener("submit",function(e){
-    e.preventDefault();
-
-    const matricula = document.getElementById("matricula").value.trim().toUpperCase();
-    const pin = document.getElementById("pin").value.trim();
-    const error = document.getElementById("error");
-    const result = document.getElementById("result");
-
-    error.style.display = "none";
-    result.style.display = "none";
-
-    if(!claseActual){
-        error.textContent = "❌ Este QR no corresponde a una clase válida.";
-        error.style.display = "block";
-        return;
-    }
-
-    const alumno = alumnos[matricula];
-
-    if(!alumno){
-        error.textContent = "❌ Matrícula no encontrada.";
-        error.style.display = "block";
-        return;
-    }
-
-    if(alumno.pin !== pin){
-        error.textContent = "❌ PIN incorrecto.";
-        error.style.display = "block";
-        return;
-    }
-
-    if(alumno.grupo !== claseActual.grupo){
-        error.textContent = "❌ Esta clase no corresponde a tu grupo.";
-        error.style.display = "block";
-        return;
-    }
-
-    /* VALIDAR EL HORARIO */
-
-    const [inicioTexto, finTexto] = claseActual.horario
-        .split(/[–-]/)
-        .map(hora => hora.trim());
-
-    function convertirAMinutos(hora){
-        const [horas, minutos] = hora.split(":").map(Number);
-        return horas * 60 + minutos;
-    }
-
-    const ahora = new Date();
-    const minutosActuales = ahora.getHours() * 60 + ahora.getMinutes();
-    const minutosInicio = convertirAMinutos(inicioTexto);
-    const minutosFin = convertirAMinutos(finTexto);
-
-    if(minutosActuales < minutosInicio || minutosActuales >= minutosFin){
-        error.textContent = `❌ Fuera de horario. Puedes registrar de ${inicioTexto} a ${finTexto}.`;
-        error.style.display = "block";
-        return;
-    }
-
-    const horaRegistro = ahora.toLocaleTimeString("es-MX",{
-        hour:"2-digit",
-        minute:"2-digit"
-    });
-
-    result.innerHTML = `
-        <strong>✅ Entrada registrada</strong><br><br>
-        <b>Alumno:</b> ${alumno.nombre}<br>
-        <b>Grupo:</b> ${alumno.grupo}<br>
-        <b>Salón:</b> ${claseActual.salon}<br>
-        <b>Materia:</b> ${claseActual.materia}<br>
-        <b>Clase:</b> ${claseActual.clase}<br>
-        <b>Horario:</b> ${claseActual.horario}<br>
-        <b>Hora de registro:</b> ${horaRegistro}
-    `;
-
-    result.style.display = "block";
-
-    const registro = {
-        matricula:matricula,
-        alumno:alumno.nombre,
-        grupo:alumno.grupo,
-        salon:claseActual.salon,
-        materia:claseActual.materia,
-        clase:claseActual.clase,
-        horario:claseActual.horario,
-        horaRegistro:horaRegistro
-    };
-
-    localStorage.setItem("ultimaAsistencia",JSON.stringify(registro));
-});
-</script>
-</body>
-</html>
+const BASE=location.origin+location.pathname;
+const SUBJECTS={formacion:"Formación Socioemocional III",ingles:"Inglés III",abc:"ABC de las Emociones",vision:"Sb3. Soluciona problemas con Visión Artificial",pensamiento:"Pensamiento Matemático III",machine:"Sb1. Soluciona problemas con Machine Learning",lenguaje:"Sb2. Soluciona problemas con Lenguaje Natural",ciencias:"Ciencias Naturales, Experimentales y Tecnología III",humanidades:"Humanidades II",lengua:"Lengua y Comunicación III",tutoria:"Tutoría"};
+const S={
+"3AIA":{
+formacion:[[1,"08:00","09:00"]],ingles:[[1,"09:00","11:00"],[2,"07:00","08:00"]],abc:[[1,"11:00","12:00"]],
+vision:[[1,"12:00","13:00"],[2,"10:00","11:00"],[3,"11:00","12:00"],[4,"09:00","10:00"],[5,"09:00","10:00"]],
+pensamiento:[[1,"13:00","14:00"],[2,"12:00","13:00"],[3,"12:00","13:00"],[4,"12:00","13:00"],[5,"12:00","13:00"]],
+machine:[[1,"14:00","15:00"],[4,"13:00","15:00"],[5,"13:00","15:00"]],
+lenguaje:[[2,"08:00","10:00"],[2,"11:00","12:00"],[4,"08:00","09:00"],[5,"08:00","09:00"]],
+ciencias:[[2,"13:00","15:00"],[3,"13:00","15:00"]],humanidades:[[3,"08:00","10:00"]],
+lengua:[[3,"10:00","11:00"],[4,"10:00","12:00"]],tutoria:[[5,"11:00","12:00"]]},
+"3BIA":{
+ciencias:[[1,"11:00","13:00"],[3,"11:00","13:00"]],machine:[[1,"13:00","14:00"],[3,"13:00","14:00"],[4,"12:00","13:00"],[5,"14:00","15:00"]],
+vision:[[1,"14:00","17:00"],[3,"14:00","15:00"],[5,"15:00","16:00"]],pensamiento:[[1,"17:00","19:00"],[2,"14:00","15:00"]],
+ingles:[[2,"11:00","12:00"],[4,"14:00","15:00"]],lenguaje:[[2,"13:00","14:00"],[4,"13:00","14:00"],[5,"11:00","14:00"]],
+lengua:[[3,"15:00","17:00"]],abc:[[3,"17:00","18:00"]],tutoria:[[4,"11:00","12:00"]],
+humanidades:[[4,"15:00","17:00"],[5,"16:00","18:00"]],formacion:[[4,"17:00","18:00"]]}}
+const STUDENTS=[{matricula:"ALU001",pin:"1234",nombre:"Alumno de prueba 1",grupo:"3AIA"},{matricula:"ALU002",pin:"2468",nombre:"Alumno de prueba 2",grupo:"3AIA"},{matricula:"ALU003",pin:"1357",nombre:"Alumno de prueba 3",grupo:"3BIA"}];
+const DAYS=["","lunes","martes","miércoles","jueves","viernes"],$=id=>document.getElementById(id),P=new URLSearchParams(location.search),G=P.get("grupo"),M=P.get("materia");
+const valid=G&&S[G]&&SUBJECTS[M]&&S[G][M];
+function slots(g,m){return (S[g][m]||[]).map(x=>DAYS[x[0]]+" "+x[1]+"–"+x[2]).join(" · ")}
+function nowSlot(g,m,n=new Date()){let d=n.getDay(),t=String(n.getHours()).padStart(2,"0")+":"+String(n.getMinutes()).padStart(2,"0");return (S[g]?.[m]||[]).find(x=>x[0]===d&&t>=x[1]&&t<x[2])}
+function records(){try{return JSON.parse(localStorage.getItem("attendanceDemo")||"[]")}catch(e){return []}}
+function renderInfo(){$("classInfo").innerHTML=valid?`<strong>${SUBJECTS[M]}</strong><br><span class="tag">Grupo ${G}</span><br><span class="muted">Horario: ${slots(G,M)}</span>`:"Escanea el QR correspondiente a tu materia y grupo."}
+$("registerBtn").onclick=()=>{let mat=$("matricula").value.trim().toUpperCase(),pin=$("pin").value.trim(),o=$("result");o.className="notice";if(!valid){o.classList.add("error");o.textContent="No se identificó la materia. Escanea el QR correcto.";return}let st=STUDENTS.find(x=>x.matricula===mat&&x.pin===pin);if(!st){o.classList.add("error");o.textContent="Matrícula o PIN incorrectos.";return}if(st.grupo!==G){o.classList.add("error");o.textContent="Este QR corresponde al grupo "+G+".";return}let n=new Date(),sl=nowSlot(G,M,n);if(!sl){o.classList.add("error");o.textContent="Fuera de horario para esta materia.";return}let rows=records(),date=n.toLocaleDateString("es-MX"),time=n.toLocaleTimeString("es-MX",{hour:"2-digit",minute:"2-digit"});if(rows.some(r=>r.matricula===mat&&r.grupo===G&&r.materia===SUBJECTS[M]&&r.fecha===date&&r.horario===sl[1]+"-"+sl[2])){o.classList.add("error");o.textContent="Esta asistencia ya fue registrada en este dispositivo.";return}rows.push({matricula:mat,nombre:st.nombre,grupo:G,materia:SUBJECTS[M],dia:DAYS[sl[0]],fecha:date,hora:time,horario:sl[1]+"-"+sl[2]});localStorage.setItem("attendanceDemo",JSON.stringify(rows));o.classList.add("ok");o.textContent="Asistencia de prueba registrada: "+st.nombre+" · "+SUBJECTS[M]+" · "+time;renderRecords()};
+function renderQR(){let g=$("qrGroup").value,h=$("qrList");h.innerHTML="";Object.keys(SUBJECTS).filter(m=>S[g][m]).forEach(m=>{let url=BASE+"?grupo="+encodeURIComponent(g)+"&materia="+encodeURIComponent(m),c=document.createElement("div");c.className="qr-card";let title=document.createElement("h3");title.textContent=SUBJECTS[m];c.append(title);let tag=document.createElement("span");tag.className="tag";tag.textContent="Grupo "+g;c.append(tag);let box=document.createElement("div");box.className="qrbox";c.append(box);if(window.QRCode)new QRCode(box,{text:url,width:160,height:160});else box.textContent="Conéctate a internet para generar el QR";let p=document.createElement("p");p.className="small";p.textContent=slots(g,m);c.append(p);let a=document.createElement("a");a.className="btn";a.href=url;a.target="_blank";a.rel="noopener";a.textContent="Probar enlace";c.append(a);let u=document.createElement("p");u.className="small";u.textContent=url;c.append(u);h.append(c)})}
+function renderRecords(){let r=records();$("attendanceList").innerHTML=r.length?"<table><tr><th>Matrícula</th><th>Grupo</th><th>Materia</th><th>Fecha</th><th>Hora</th></tr>"+r.slice().reverse().map(x=>"<tr><td>"+x.matricula+"</td><td>"+x.grupo+"</td><td>"+x.materia+"</td><td>"+x.fecha+"</td><td>"+x.hora+"</td></tr>").join("")+"</table>":"<p class='muted'>Sin registros de prueba todavía.</p>"}
+$("qrGroup").onchange=renderQR;$("printBtn").onclick=()=>window.print();$("exportBtn").onclick=()=>{let r=records();if(!r.length){alert("No hay registros.");return}let cols=["matricula","nombre","grupo","materia","dia","fecha","hora","horario"],csv=[cols.join(","),...r.map(x=>cols.map(k=>'"'+String(x[k]||"").replace(/"/g,'""')+'"').join(","))].join("\r\n"),a=document.createElement("a");a.href=URL.createObjectURL(new Blob(["\ufeff"+csv],{type:"text/csv;charset=utf-8"}));a.download="asistencias-prueba.csv";a.click();URL.revokeObjectURL(a.href)};
+$("clearBtn").onclick=()=>{if(confirm("¿Borrar los registros de prueba?")){localStorage.removeItem("attendanceDemo");renderRecords()}};renderInfo();renderQR();renderRecords();
+</script></body></html>
