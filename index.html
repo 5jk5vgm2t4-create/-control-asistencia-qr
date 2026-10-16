@@ -62,4 +62,12 @@ function renderQR(){let g=$("qrGroup").value,h=$("qrList");h.innerHTML="";Object
 function renderRecords(){let r=records();$("attendanceList").innerHTML=r.length?"<table><tr><th>Matrícula</th><th>Grupo</th><th>Materia</th><th>Fecha</th><th>Hora</th></tr>"+r.slice().reverse().map(x=>"<tr><td>"+x.matricula+"</td><td>"+x.grupo+"</td><td>"+x.materia+"</td><td>"+x.fecha+"</td><td>"+x.hora+"</td></tr>").join("")+"</table>":"<p class='muted'>Sin registros de prueba todavía.</p>"}
 $("qrGroup").onchange=renderQR;$("printBtn").onclick=()=>window.print();$("exportBtn").onclick=()=>{let r=records();if(!r.length){alert("No hay registros.");return}let cols=["matricula","nombre","grupo","materia","dia","fecha","hora","horario"],csv=[cols.join(","),...r.map(x=>cols.map(k=>'"'+String(x[k]||"").replace(/"/g,'""')+'"').join(","))].join("\r\n"),a=document.createElement("a");a.href=URL.createObjectURL(new Blob(["\ufeff"+csv],{type:"text/csv;charset=utf-8"}));a.download="asistencias-prueba.csv";a.click();URL.revokeObjectURL(a.href)};
 $("clearBtn").onclick=()=>{if(confirm("¿Borrar los registros de prueba?")){localStorage.removeItem("attendanceDemo");renderRecords()}};renderInfo();renderQR();renderRecords();
-</script></body></html>
+</script></<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  const SUPABASE_URL = "https://tgxuapxfrdddokcdnelz.supabase.co/rest/v1/";
+  const SUPABASE_KEY = "sb_publishable_tUTDrGuNVSA02ejG1HG1jA_Gp0Dxl84";
+  const supabaseClient = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+  );
+</script>></html>
